@@ -1,23 +1,39 @@
-// importamos la query de likesQueries.js
+// Importamos la query de likesQueries.js.
 const likesQueries = require('../../db/noticesQueries/likesQueries');
 
-//Creamos la funcion de likes
+// Creamos la funcion de likes.
 const likes = async (req, res, next) => {
     try {
-        //obtenemos el id de la noticia y el id del usuario
+        // Obtenemos el id de la noticia y el id del usuario.
         const { idNotice } = req.params;
 
         const { idUser } = req;
 
         const { vote } = req.body;
 
-        //llamamos a la funcion likeQueries
-        await likesQueries(idNotice, idUser, vote);
-        res.send({ status: 'ok', mensage: 'like añadido' });
+        // Comprobamos que los valores esten correctos antes de la llamada a la query.
+        if (vote !== true && vote !== false && vote !== null) {
+            res.send({
+                status: 'Error',
+                message: 'El valor del like no es correcto.',
+            });
+        } else {
+            // Llamamos a la funcion likeQueries.
+            await likesQueries(idNotice, idUser, vote);
+
+            // Condición que arroja mensaje de estatus like.
+            if (vote === true) {
+                res.send({ status: 'ok', mensage: 'like añadido' });
+            } else if (vote === false) {
+                res.send({ status: 'ok', mensage: 'dislike añadido' });
+            } else if (vote === null) {
+                res.send({ status: 'ok', mensage: 'voto eliminado' });
+            }
+        }
     } catch (err) {
         next(err);
     }
 };
 
-//exportamos la funcion de likes
+// Exportamos la funcion de likes.
 module.exports = likes;
